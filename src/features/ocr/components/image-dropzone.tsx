@@ -16,7 +16,6 @@ export function ImageDropzone({ onSelect }: ImageDropzoneProps) {
     const file = event.target.files?.[0];
     if (file) onSelect(file);
 
-    // Reset so selecting the same file again still fires `change`.
     event.target.value = '';
   }
 

@@ -1,7 +1,6 @@
 import { formatBytes } from '@/lib/format';
 import { ACCEPTED_FORMATS_LABEL, ACCEPTED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES } from '../constants';
 
-/** Returns a user-facing error message, or `null` when the file is valid. */
 export function validateImage(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return `Unsupported file type. Use ${ACCEPTED_FORMATS_LABEL}.`;

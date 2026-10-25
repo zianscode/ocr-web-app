@@ -1,18 +1,11 @@
 import type { BoundingBox, OcrLine, OcrWord } from '../types';
 
-/** Lines sharing at least this fraction of the shorter line's height belong to the same row. */
 const ROW_OVERLAP_RATIO = 0.5;
 
-/**
- * Horizontal gaps wider than this fraction of the row height separate columns.
- * Regular word spacing is roughly a quarter of the font height.
- */
 const COLUMN_GAP_RATIO = 0.8;
 
-/** Columns are also at least this many characters apart, so a space after narrow punctuation is not mistaken for one. */
 const MIN_COLUMN_GAP_IN_CHARS = 2;
 
-/** Phrases shorter than this are too noisy to measure character width from. */
 const MIN_MEASURABLE_PHRASE_LENGTH = 4;
 
 const MAX_CONSECUTIVE_BLANK_LINES = 3;
@@ -23,29 +16,19 @@ interface Row {
   words: OcrWord[];
 }
 
-/** A run of words separated only by regular word spacing. */
 interface Phrase {
   text: string;
   x0: number;
   x1: number;
 }
 
-/**
- * Rebuilds the spatial layout of recognized text as monospaced plain text.
- *
- * Phrases keep their horizontal position (so indentation, columns and tables
- * stay aligned), lines that sit side by side are merged into one row, and large
- * vertical gaps become blank lines.
- */
 export function reconstructLayout(lines: OcrLine[]): string {
   const rows = groupIntoRows(lines);
   if (rows.length === 0) return '';
 
-  // First pass: rough phrases (split by row height alone) to measure character width.
   const roughPhrases = rows.flatMap((row) => splitIntoPhrases(row, height(row) * COLUMN_GAP_RATIO));
   const charWidth = estimateCharWidth(roughPhrases);
 
-  // Second pass: final phrases, now that the character width is known.
   const phrasesByRow = rows.map((row) =>
     splitIntoPhrases(
       row,
@@ -60,7 +43,6 @@ export function reconstructLayout(lines: OcrLine[]): string {
   rows.forEach((row, index) => {
     if (index > 0) {
       const gap = row.top - rows[index - 1].bottom;
-      // Regular line spacing is well under one row height, so only larger gaps become blank lines.
       const blankLines = clamp(Math.floor(gap / rowHeight), 0, MAX_CONSECUTIVE_BLANK_LINES);
       output.push(...Array<string>(blankLines).fill(''));
     }
@@ -122,7 +104,6 @@ function renderRow(phrases: Phrase[], leftEdge: number, charWidth: number): stri
 
   for (const phrase of phrases) {
     const column = Math.round((phrase.x0 - leftEdge) / charWidth);
-    // Never let a phrase overlap the previous one.
     const minColumn = text.length === 0 ? 0 : text.length + 1;
     text = text.padEnd(Math.max(column, minColumn)) + phrase.text;
   }
@@ -130,10 +111,6 @@ function renderRow(phrases: Phrase[], leftEdge: number, charWidth: number): stri
   return text;
 }
 
-/**
- * Average character advance in pixels (spaces included), used to map pixel
- * positions to text columns.
- */
 function estimateCharWidth(phrases: Phrase[]): number {
   const measurable = phrases.filter((phrase) => phrase.text.length >= MIN_MEASURABLE_PHRASE_LENGTH);
   const sample = measurable.length > 0 ? measurable : phrases;

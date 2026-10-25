@@ -46,7 +46,6 @@ export function ResultPanel({ status, progress, result, error }: ResultPanelProp
         <pre
           className={cn(
             'max-h-[32rem] flex-1 overflow-auto p-4 font-mono text-[13px] leading-6 text-ink',
-            // Layout view must not wrap, otherwise columns lose their alignment.
             view === 'layout' ? 'whitespace-pre' : 'whitespace-pre-wrap break-words',
           )}
         >
@@ -79,7 +78,6 @@ function RecognitionProgress({ progress }: { progress: number }) {
   return (
     <div className="flex flex-1 flex-col justify-center gap-3 px-8">
       <div className="flex justify-between font-mono text-xs text-ink-muted">
-        {/* Progress stays at 0 while the engine and language data load. */}
         <span>{progress === 0 ? 'Loading OCR engine…' : 'Reading text…'}</span>
         <span>{progress}%</span>
       </div>

@@ -10,7 +10,6 @@ export function useImageFile() {
   const [preview, setPreview] = useState<ImagePreviewData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // The object URL lives exactly as long as the selected file.
   useEffect(() => {
     setPreview(null);
     if (!file) return;
@@ -34,7 +33,6 @@ export function useImageFile() {
     };
   }, [file]);
 
-  /** Selects a file if it is valid. Returns whether the selection was accepted. */
   const select = useCallback((candidate: File): boolean => {
     const validationError = validateImage(candidate);
     setError(validationError);

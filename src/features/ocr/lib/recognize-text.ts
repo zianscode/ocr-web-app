@@ -1,18 +1,19 @@
 import { OCR_LANGUAGE } from '../constants';
-import type { OcrLine, RecognitionResult } from '../types';
+import type { RecognitionResult } from '../types';
+import { collectWords } from './collect-words';
+import { prepareImageForOcr } from './prepare-image';
 import { reconstructLayout } from './reconstruct-layout';
 
 type ProgressHandler = (percentage: number) => void;
 
-/**
- * Runs OCR on an image with a short-lived Tesseract worker.
- * Tesseract is imported lazily so it stays out of the initial bundle.
- */
 export async function recognizeText(
   image: File,
   onProgress: ProgressHandler,
 ): Promise<RecognitionResult> {
-  const { createWorker, OEM } = await import('tesseract.js');
+  const [{ createWorker, OEM, PSM }, preparedImage] = await Promise.all([
+    import('tesseract.js'),
+    prepareImageForOcr(image),
+  ]);
 
   const worker = await createWorker(OCR_LANGUAGE, OEM.LSTM_ONLY, {
     logger: (message) => {
@@ -23,21 +24,14 @@ export async function recognizeText(
   });
 
   try {
-    // `blocks` includes the bounding box of every line and word.
-    const { data } = await worker.recognize(image, {}, { text: true, blocks: true });
+    await worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_BLOCK });
 
-    const lines: OcrLine[] = (data.blocks ?? [])
-      .flatMap((block) => block.paragraphs)
-      .flatMap((paragraph) => paragraph.lines)
-      .map((line) => ({
-        bbox: line.bbox,
-        words: line.words
-          .map((word) => ({ text: word.text.trim(), bbox: word.bbox }))
-          .filter((word) => word.text.length > 0),
-      }));
+    const { data } = await worker.recognize(preparedImage, {}, { blocks: true });
+
+    const { lines, plainText } = collectWords(data.blocks ?? []);
 
     return {
-      plainText: data.text.trim(),
+      plainText,
       layoutText: reconstructLayout(lines),
     };
   } finally {

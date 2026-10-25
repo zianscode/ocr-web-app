@@ -10,7 +10,6 @@ export interface ImagePreviewData {
 
 export type RecognitionStatus = 'idle' | 'recognizing' | 'success' | 'error';
 
-/** Pixel coordinates in the source image. */
 export interface BoundingBox {
   x0: number;
   y0: number;
@@ -29,9 +28,7 @@ export interface OcrLine {
 }
 
 export interface RecognitionResult {
-  /** Text as Tesseract reads it, in reading order. */
   plainText: string;
-  /** Text positioned to mirror the layout of the source image. */
   layoutText: string;
 }
 

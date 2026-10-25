@@ -22,7 +22,6 @@ const RECOGNITION_FAILED_ERROR = 'Something went wrong while reading the image. 
 export function useTextRecognition() {
   const [state, setState] = useState<RecognitionState>(INITIAL_STATE);
 
-  // Incremented on every run and reset, so results from stale runs are ignored.
   const latestRunIdRef = useRef(0);
 
   const recognize = useCallback(async (image: File) => {

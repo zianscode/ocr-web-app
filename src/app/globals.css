@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Design tokens. Use them through Tailwind utilities (bg-canvas, text-ink, border-line, ...). */
 :root {
   --canvas: #f4f2ed;
   --surface: #fbfaf7;
@@ -11,7 +10,6 @@
   --danger: #b42318;
   --scrollbar: #c9c4b8;
 
-  /* Lets native UI (scrollbars, form controls) follow the theme. */
   color-scheme: light;
 }
 

@@ -13,15 +13,27 @@ Extract text from images directly in the browser. Recognition runs client-side w
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev
 ```
 
-| Script          | Description                    |
-| --------------- | ------------------------------ |
+Then open [http://localhost:3000](http://localhost:3000).
+
+| Script          | Description                      |
+| --------------- | -------------------------------- |
 | `npm run dev`   | Start the dev server (Turbopack) |
-| `npm run build` | Create a production build      |
-| `npm run start` | Serve the production build     |
-| `npm run lint`  | Run ESLint                     |
+| `npm run build` | Create a production build        |
+| `npm run start` | Serve the production build       |
+| `npm run lint`  | Run ESLint                       |
+
+## Recognition pipeline
+
+1. **Preprocessing** (`src/features/ocr/lib/preprocess-image.ts`): converts to grayscale,
+   inverts dark-themed images, stretches contrast and upscales small text (line height
+   under 16 px) to about 28 px. Upscaling helps screenshots and code most; larger text is
+   left as is because upscaling made blurry text worse in benchmarks.
+2. **Tesseract** runs in single-block mode (PSM 6), which keeps narrow columns such as
+   code line numbers.
+3. **Layout reconstruction** rebuilds spacing from word positions (see below).
 
 ## Output views
 
@@ -37,20 +49,20 @@ so an internet connection is required.
 
 ```
 src/
-├── app/                    # Routes, root layout, global styles, icons
+├── app/
 ├── components/
-│   ├── layout/             # Site header and footer
-│   └── ui/                 # Generic, reusable UI primitives (Button, Panel, ...)
+│   ├── layout/
+│   └── ui/
 ├── features/
-│   └── ocr/                # Everything specific to text recognition
-│       ├── components/     # Feature UI (workspace, source & result panels)
-│       ├── hooks/          # Feature state (image file, recognition)
-│       ├── lib/            # Pure helpers and the Tesseract wrapper
+│   └── ocr/
+│       ├── components/
+│       ├── hooks/
+│       ├── lib/
 │       ├── constants.ts
 │       ├── types.ts
-│       └── index.ts        # Public API of the feature
-├── hooks/                  # Shared hooks
-└── lib/                    # Shared utilities
+│       └── index.ts
+├── hooks/
+└── lib/
 ```
 
 ## Conventions
