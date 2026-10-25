@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OCR Web App
 
-## Getting Started
+Extract text from images directly in the browser. Recognition runs client-side with
+[Tesseract.js](https://tesseract.projectnaptha.com/), so images are never uploaded to a server.
 
-First, run the development server:
+## Tech stack
+
+- Next.js 15 (App Router), React 19, TypeScript
+- Tailwind CSS v4
+- Tesseract.js 6 (English, LSTM engine)
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Script          | Description                    |
+| --------------- | ------------------------------ |
+| `npm run dev`   | Start the dev server (Turbopack) |
+| `npm run build` | Create a production build      |
+| `npm run start` | Serve the production build     |
+| `npm run lint`  | Run ESLint                     |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Output views
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Layout** (default): rebuilds the text so it mirrors the image. Indentation, columns and
+  tables stay aligned, using the word positions Tesseract reports
+  (`src/features/ocr/lib/reconstruct-layout.ts`).
+- **Plain**: text in reading order, best for pasting into documents.
 
-## Learn More
+The first extraction downloads the Tesseract engine and English language data from a CDN,
+so an internet connection is required.
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                    # Routes, root layout, global styles, icons
+├── components/
+│   ├── layout/             # Site header and footer
+│   └── ui/                 # Generic, reusable UI primitives (Button, Panel, ...)
+├── features/
+│   └── ocr/                # Everything specific to text recognition
+│       ├── components/     # Feature UI (workspace, source & result panels)
+│       ├── hooks/          # Feature state (image file, recognition)
+│       ├── lib/            # Pure helpers and the Tesseract wrapper
+│       ├── constants.ts
+│       ├── types.ts
+│       └── index.ts        # Public API of the feature
+├── hooks/                  # Shared hooks
+└── lib/                    # Shared utilities
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Conventions
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- File names are `kebab-case`; components and hooks use named exports.
+- Code outside a feature imports it only through its `index.ts`.
+- Colors come from design tokens in `src/app/globals.css` (`bg-canvas`, `text-ink`,
+  `border-line`, `text-accent`, ...). Avoid raw Tailwind palette colors.
+- `'use client'` is declared only at the client boundary (`ocr-workspace.tsx`).

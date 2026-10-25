@@ -1,69 +1,19 @@
-'use client';
+import { OcrWorkspace } from '@/features/ocr';
 
-import React from 'react';
-import Header from '../components/Header';
-import ImageUpload from '../components/ImageUpload';
-import ImagePreview from '../components/ImagePreview';
-import ActionButtons from '../components/ActionButtons';
-import ProgressBar from '../components/ProgressBar';
-import TextResult from '../components/TextResult';
-import Footer from '../components/Footer';
-import { useOCR } from '../hooks/useOCR';
-
-export default function Home() {
-  const {
-    image,
-    imagePreview,
-    imageDimensions,
-    text,
-    loading,
-    progress,
-    error,
-    handleImageChange,
-    handleOCR,
-    handleCopyText,
-    handleClearAll
-  } = useOCR();
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <Header />
-        
-        <ImageUpload 
-          onImageChange={handleImageChange}
-          error={error}
-        />
+    <>
+      <section className="mb-8 max-w-xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          Turn images into editable text.
+        </h1>
+        <p className="mt-2 text-ink-muted">
+          Upload a scan, screenshot or photo. Recognition runs entirely in your browser, so your
+          images never leave your device.
+        </p>
+      </section>
 
-        {imagePreview && imageDimensions && (
-          <ImagePreview 
-            imagePreview={imagePreview}
-            imageDimensions={imageDimensions}
-          />
-        )}
-
-        {image && (
-          <ActionButtons
-            onExtractText={handleOCR}
-            onClearAll={handleClearAll}
-            loading={loading}
-            progress={progress}
-          />
-        )}
-
-        {loading && progress > 0 && (
-          <ProgressBar progress={progress} />
-        )}
-
-        {text && !loading && (
-          <TextResult 
-            text={text}
-            onCopyText={handleCopyText}
-          />
-        )}
-
-        <Footer />
-      </div>
-    </main>
+      <OcrWorkspace />
+    </>
   );
 }

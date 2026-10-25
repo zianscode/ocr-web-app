@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
+/* Design tokens. Use them through Tailwind utilities (bg-canvas, text-ink, border-line, ...). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --canvas: #f4f2ed;
+  --surface: #fbfaf7;
+  --ink: #1c1b19;
+  --ink-muted: #6b6860;
+  --line: #dcd8cf;
+  --accent: #d9481c;
+  --danger: #b42318;
+  --scrollbar: #c9c4b8;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Lets native UI (scrollbars, form controls) follow the theme. */
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --canvas: #141412;
+    --surface: #1b1a18;
+    --ink: #eceae4;
+    --ink-muted: #9a968c;
+    --line: #2f2d29;
+    --accent: #f06a3b;
+    --danger: #f97066;
+    --scrollbar: #3d3a35;
+
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
 }
